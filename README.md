@@ -60,49 +60,6 @@
         *   `WX_BASE_URL`: (可选) 点击模板消息后跳转的基础 URL。
     *   **注意**：添加变量时，请确保勾选 **加密** 选项，以保护您的凭证安全。
 
-### 方法二：Docker 直接部署（需要有docker环境）
-
-**拉取镜像**
-
-```bash
-docker pull ghcr.io/frankiejun/wxpush:latest
-```
-
-**运行容器**
-
-```bash
-docker run -d --name wxpush \
-  -p 3939:3939 \
-  -e API_TOKEN="your_token" \
-  -e WX_APPID="your_appid" \
-  -e WX_SECRET="your_secret" \
-  -e WX_USERID="openid1|openid2" \
-  -e WX_TEMPLATE_ID="your_template_id" \
-  -e WX_BASE_URL="https://example.com" \
-  -e PORT="3939" \
-  ghcr.io/frankiejun/wxpush:latest
-```
-
-**docker-compose**
-
-创建 `docker-compose.yml`，直接使用镜像运行：
-
-```yaml
-services:
-  wxpush:
-    image: ghcr.io/frankiejun/wxpush:latest
-    ports:
-      - "3939:3939"
-    environment:
-      API_TOKEN: "your_token"
-      WX_APPID: "your_appid"
-      WX_SECRET: "your_secret"
-      WX_USERID: "openid1|openid2"
-      WX_TEMPLATE_ID: "your_template_id"
-      WX_BASE_URL: "https://example.com"
-      PORT: "3939"
-    restart: unless-stopped
-```
 
 ### 方法三：通过关联 GitHub 仓库自动部署
 
@@ -137,19 +94,18 @@ services:
 
 ## ⚙️ API 使用方法
 
-服务部署成功后，您可以通过构造 URL 发起 `GET` 请求来推送消息。
+服务部署成功后，可以通过 `POST` 请求发送消息。
 
 ### 请求地址
 
 ```
-https://<您的Worker地址>/wxsend
+https://<您的Worker地址>/api/wxsend
 ```
 
 ### 请求参数
 
 | 参数名      | 类型   | 是否必填 | 描述                                           |
 |-------------|--------|----------|------------------------------------------------|
-| `token`     | String | 是       | 您在 `API_TOKEN` 中设置的访问令牌。            |
 | `title`     | String | 是       | 消息的标题。                                   |
 | `content`   | String | 是       | 消息的具体内容。                               |
 | `appid`     | String | 否       | 临时覆盖默认的微信 AppID。                     |
@@ -158,66 +114,33 @@ https://<您的Worker地址>/wxsend
 | `template_id`| String | 否       | 临时覆盖默认的模板消息 ID。                    |
 | `base_url`  | String | 否       | 临时覆盖默认的跳转 URL。                       |
 
-### 使用示例
-
-**基础推送**
-
-向默认配置的所有用户推送一条消息：
-
-```
-https://<您的Worker地址>/wxsend?title=服务器通知&content=服务已于北京时间%2022:00%20重启&token=your_secret_token
-```
-
-**临时覆盖用户**
-
-向一个临时指定的用户推送消息：
-
-```
-https://<您的Worker地址>/wxsend?title=私人提醒&content=记得带钥匙&token=your_secret_token&userid=temporary_openid_here
-```
-
-### Webhook / POST 请求
-
-除了 `GET` 请求，服务也支持 `POST` 方法，更适合用于自动化的 Webhook 集成。
-
-**请求地址**
-
-```
-https://<您的Worker地址>/wxsend
-```
-
-**请求方法**
-
-```
-POST
-```
-
-**请求头 (Headers)**
+### 请求头
 
 ```json
 {
-  "Authorization": "你的token",
+  "Authorization": "Bearer your_secret_token",
   "Content-Type": "application/json"
 }
 ```
 
-**请求体 (Body)**
-
-请求体需要是一个 JSON 对象，包含与 `GET` 请求相同的参数。
+### 请求体
 
 ```json
 {
-  "title": "Webhook 通知",
-  "content": "这是一个通过 POST 请求发送的 Webhook 消息。"
+  "title": "服务器通知",
+  "content": "服务已于北京时间 22:00 重启。",
+  "userid": "temporary_openid_here"
 }
 ```
 
-**使用示例 (cURL)**
+`userid`、`appid`、`secret`、`template_id` 和 `base_url` 可选；未提供时使用 Worker 环境变量。
+
+### cURL 示例
 
 ```bash
 curl -X POST \
-  "https://<您的Worker地址>/wxsend" \
-  -H "Authorization: 你的token" \
+  "https://<您的Worker地址>/api/wxsend" \
+  -H "Authorization: Bearer your_secret_token" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "来自 cURL 的消息",
@@ -231,7 +154,7 @@ curl -X POST \
 
 ```json
 {
-  "msg": "Successfully sent messages to 1 user(s). First response: ok"
+  "msg": "Successfully sent messages to 1 user(s)."
 }
 ```
 

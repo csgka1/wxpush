@@ -1,6 +1,10 @@
 name = "wxpush"
-main = "src/index.js"
-compatibility_date = "2023-11-21"
+main = "./src/index.tsx"
+compatibility_date = "2026-07-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./public"
 
 [triggers]
 crons = ["0 2 * * *"]
