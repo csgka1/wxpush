@@ -24,7 +24,7 @@ export default function Skin({ title, message, date }: SkinProps) {
 
                 <div class="info-card">
                     <div class="info-label">时间</div>
-                    <div class="info-content">{getBeijingTime(date)}</div>
+                    <div class="info-content">{date ? getBeijingTime(date): "无日期信息"}</div>
                 </div>
             </div>
             <Script src="/src/client/skin.client.tsx" />

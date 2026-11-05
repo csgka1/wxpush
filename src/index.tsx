@@ -17,7 +17,7 @@ RegisterApi(app)
 const SkinSchema = z.object({
     title: z.string().default('消息推送'),
     message: z.string().default('无告警信息'),
-    date: z.date(),
+    date: z.date().optional(),
 });
 
 
