@@ -13,4 +13,10 @@ crons = ["0 2 * * *"]
 enabled = true
 invocation_logs = true
 
-[previews]
+
+[previews.vars]
+ALIVE_DAYS = "7"
+PARAM_KEY = "..."
+WX_BASE_URL = "https://refactor-wxpush.acofwidth.workers.dev"
+WX_TEMPLATE_ID = "hiq_qljLqV0MWxko7LM9-Wwjbi1qUjN6epPkMThkrvc"
+
